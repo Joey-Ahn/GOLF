@@ -9,7 +9,7 @@ library(ggplot2)
 conn <- dbConnect(RSQLite::SQLite(), "score_db.sqlite")
 #...........................................................................................................................................
 get.score <- function() {
-  res <- dbSendQuery(conn, "SELECT * FROM score_db")
+  res <- dbSendQuery(conn, "SELECT Date, Time, Course, Golfzon, id FROM score_db")
   score <- dbFetch(res)
   dbClearResult(res)
   score$Date <- as.Date(score$Date)
@@ -17,11 +17,11 @@ get.score <- function() {
   score$Course <- as.character(score$Course)
   score$Golfzon <- as.factor(score$Golfzon)
   score$Time <- as.factor(score$Time)
-  score$Joey <- as.integer(score$Joey)
-  score$Lucy <- as.integer(score$Lucy)
-  score$David <- as.integer(score$David)
-  score$Steve <- as.integer(score$Steve)
-  score$Jun <- as.integer(score$Jun)
+  # score$Joey <- as.integer(score$Joey)
+  # score$Lucy <- as.integer(score$Lucy)
+  # score$David <- as.integer(score$David)
+  # score$Steve <- as.integer(score$Steve)
+  # score$Jun <- as.integer(score$Jun)
   score[is.na(score)] <- 0
   return(score)
 }
@@ -62,11 +62,11 @@ score.insert.callback <- function(data, row) {
                   "'", as.character(data[row,]$Time), "', ",
                   "'", data[row,]$Course, "', ",
                   "'", as.character(data[row,]$Golfzon), "', ",
-                  "", data[row,]$Joey, ", ",
-                  "", data[row,]$Lucy, ", ",
-                  "", data[row,]$David, ", ",
-                  "", data[row,]$Steve, ", ",
-                  "", data[row,]$Jun, ", ",
+                  # "", data[row,]$Joey, ", ",
+                  # "", data[row,]$Lucy, ", ",
+                  # "", data[row,]$David, ", ",
+                  # "", data[row,]$Steve, ", ",
+                  # "", data[row,]$Jun, ", ",
                   "", max(get.score()$id) + 1, "",
                   ")")
   print(query) # For debugging
@@ -80,11 +80,11 @@ score.update.callback <- function(data, olddata, row) {
                   "Time = '", as.character(data[row,]$Time), "', ",
                   "Course = '", data[row,]$Course, "', ",
                   "Golfzon = '", as.character(data[row,]$Golfzon), "', ",
-                  "Joey = ", data[row,]$Joey, ", ",
-                  "Lucy = ", data[row,]$Lucy, ", ",
-                  "David = ", data[row,]$David, ", ",
-                  "Steve = ", data[row,]$Steve, ", ",
-                  "Jun = ", data[row,]$Jun, " ",
+                  # "Joey = ", data[row,]$Joey, ", ",
+                  # "Lucy = ", data[row,]$Lucy, ", ",
+                  # "David = ", data[row,]$David, ", ",
+                  # "Steve = ", data[row,]$Steve, ", ",
+                  # "Jun = ", data[row,]$Jun, " ",
                   "WHERE id = ", data[row,]$id)
   print(query) # For debugging
   dbSendQuery(conn, query)
@@ -103,10 +103,13 @@ server <- function(input, output) {
   dtedit(input, output,
          name = 'score',
          thedata = score,
-         edit.cols = c("Date", "Time", "Course", "Golfzon", "Joey", "Lucy", "David", "Steve", "Jun"),
-         edit.label.cols = c("Date", "AM/PM", "Course", "Golfzon", "Joey", "Lucy", "David", "Steve", "Jun"),
          input.types = c(Course='textInput'),
-         view.cols = names(score)[c(1, 2, 3, 5, 6, 7, 8, 9)],
+         # edit.cols = c("Date", "Time", "Course", "Golfzon", "Joey", "Lucy", "David", "Steve", "Jun"),
+         # edit.label.cols = c("Date", "AM/PM", "Course", "Golfzon", "Joey", "Lucy", "David", "Steve", "Jun"),
+         # view.cols = names(score)[c(1, 2, 3, 5, 6, 7, 8, 9)],
+         edit.cols = c("Date", "Time", "Course", "Golfzon"),
+         edit.label.cols = c("Date", "AM/PM", "Course", "Golfzon"),
+         view.cols = names(score)[c(1, 2, 3, 5)],
          callback.update = score.update.callback,
          callback.insert = score.insert.callback,
          callback.delete = score.delete.callback)
